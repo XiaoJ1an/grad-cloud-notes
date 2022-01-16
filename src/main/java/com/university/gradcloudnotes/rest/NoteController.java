@@ -9,10 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "api/cloud", produces = "application/json;charset=utf-8")
@@ -26,17 +23,23 @@ public class NoteController {
     /**新增笔记*/
     @ResponseBody
     @PostMapping("/notes/addNotes")
-    public NoteResponse addNotes(NoteRequest noteRequest) {
+    public NoteResponse addNotes(@RequestBody NoteRequest noteRequest) {
         logger.info("新增笔记接口入参noteRequest={}", JSON.toJSONString(noteRequest));
         /**数据非空校验*/
-        if(StringUtils.isBlank(noteRequest.getNoteTitle()))
+        if(StringUtils.isBlank(noteRequest.getTitle()))
             return GetReturn.getReturn("400", "笔记标题为空！", null);
-        if(StringUtils.isBlank(noteRequest.getNoteContent()))
+        if(StringUtils.isBlank(noteRequest.getContent()))
             return GetReturn.getReturn("400", "笔记内容为空！", null);
-        if(StringUtils.isBlank(noteRequest.getNoteType()))
+        if(StringUtils.isBlank(noteRequest.getType()))
             return GetReturn.getReturn("400", "笔记类型为空！", null);
         if(StringUtils.isBlank(noteRequest.getGroupId()))
             return GetReturn.getReturn("400", "笔记分组为空！", null);
+        if(StringUtils.isBlank(noteRequest.getUserId()))
+            return GetReturn.getReturn("400", "笔记所有者为空！", null);
+        if(StringUtils.isBlank(noteRequest.getPushDate()))
+            return GetReturn.getReturn("400", "笔记推送日期为空！", null);
+        if(StringUtils.isBlank(noteRequest.getPushTime()))
+            return GetReturn.getReturn("400", "笔记推送时间为空！", null);
         /**调用service方法*/
         try {
             NoteResponse noteResponse = noteService.addNotes(noteRequest);

@@ -7,13 +7,21 @@ public class NoteRequest {
     /**笔记id*/
     private String noteId;
     /**笔记标题*/
-    private String noteTitle;
+    private String title;
     /**笔记内容*/
-    private String noteContent;
+    private String content;
     /**笔记类型*/
-    private String noteType;
+    private String type;
+    /**笔记状态*/
+    private String state;
     /**笔记所属组*/
     private String groupId;
+    /**笔记所属者*/
+    private String userId;
+    /**推送日期*/
+    private String pushDate;
+    /**推送时间*/
+    private String pushTime;
     /**创建日期*/
     private String makeDate;
     /**创建时间*/
