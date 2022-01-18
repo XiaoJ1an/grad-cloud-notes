@@ -5,6 +5,7 @@ import com.university.gradcloudnotes.entity.response.NoteResponse;
 import com.university.gradcloudnotes.jpa.CnNote;
 import com.university.gradcloudnotes.repository.CnNoteRepository;
 import com.university.gradcloudnotes.rest.NoteController;
+import com.university.gradcloudnotes.utils.EncryptUtil;
 import com.university.gradcloudnotes.utils.GetReturn;
 import com.university.gradcloudnotes.utils.PubFun;
 import com.university.gradcloudnotes.utils.UUIDUtil;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 public class NoteService {
 
     private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
+    /**密钥*/
+    public static final String key = "abcdefabcdefabcdefabcdef";
 
     @Autowired
     private CnNoteRepository cnNoteRepository;

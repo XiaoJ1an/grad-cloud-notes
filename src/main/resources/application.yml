@@ -7,4 +7,10 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
     password: 115z6311.13S
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#配置日志输出路径
+logging:
+  level:
+    com.university: debug
+  file:
+    path: log/
