@@ -19,7 +19,7 @@ public class EncryptUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
 
-    private static final String ALGORITHM = "ASDddd";
+    private static final String ALGORITHM = "DESede";
 
     /**返回加密字符串*/
     public static String getEncrypeStr(String key, String passwd) {
@@ -49,7 +49,7 @@ public class EncryptUtil {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             for (int pos = 0; pos < buffer.length; pos++) {
-                stringBuilder.append(hexToAscii((buffer[pos] >>> 4)) & 0x0F).append(hexToAscii(buffer[pos] & 0x0F));
+                stringBuilder.append(hexToAscii((buffer[pos] >>> 4) & 0x0F)).append(hexToAscii(buffer[pos] & 0x0F));
             }
         } catch (Exception e) {
             logger.info("2进制转16进制失败！！！e={}", e);

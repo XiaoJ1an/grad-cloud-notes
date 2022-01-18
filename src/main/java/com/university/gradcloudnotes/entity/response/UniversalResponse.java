@@ -3,7 +3,7 @@ package com.university.gradcloudnotes.entity.response;
 import lombok.Data;
 
 @Data
-public class NoteResponse {
+public class UniversalResponse {
     /**状态码*/
     private String code;
     /**返回消息*/
