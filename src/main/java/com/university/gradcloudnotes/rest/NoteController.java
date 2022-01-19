@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "api/cloud", produces = "application/json;charset=utf-8")
 public class NoteController {
@@ -48,6 +51,17 @@ public class NoteController {
         } catch (Exception e) {
             logger.info("调用service方法出现异常！e={}", e);
             return GetReturn.getReturn("400", "新增笔记异常！", null);
+        }
+    }
+
+    /**修改笔记状态*/
+    @ResponseBody
+    @PostMapping("/notes/updateNoteType")
+    public UniversalResponse updateNoteType(@RequestParam List<String> noteIds, @RequestParam String type) {
+        try {
+            return noteService.updateNoteType(noteIds, type);
+        } catch (ParseException e) {
+            return GetReturn.getReturn("400", "调用service方法发生异常！", null);
         }
     }
 
