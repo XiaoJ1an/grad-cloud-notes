@@ -25,6 +25,7 @@ public class CnUser {
   private String phoneNo;
   private String nickName;
   private String picture;
+  private String userRole;
   private String makeDate;
   private String makeTime;
   private String modifyDate;

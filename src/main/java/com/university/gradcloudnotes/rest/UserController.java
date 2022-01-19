@@ -1,5 +1,6 @@
 package com.university.gradcloudnotes.rest;
 
+import com.university.gradcloudnotes.entity.request.LoginRequest;
 import com.university.gradcloudnotes.entity.request.RegisterRequest;
 import com.university.gradcloudnotes.entity.response.UniversalResponse;
 import com.university.gradcloudnotes.service.UserService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "api/cloud", produces = "application/json;charset=utf-8")
+@RequestMapping(path = "/api/cloud", produces = "application/json;charset=utf-8")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -34,5 +35,18 @@ public class UserController {
             return GetReturn.getReturn("400", "新用户注册异常！", null);
         }
     }
+
+    /**用户登录接口*/
+    @PostMapping("/user/login")
+    public UniversalResponse login(@RequestBody LoginRequest loginRequest) {
+        try {
+            UniversalResponse response = userService.login(loginRequest);
+            return response;
+        } catch (Exception e) {
+            logger.info("调用service方法发生异常！e={}", e);
+            return GetReturn.getReturn("400", "调用service方法发生异常！", null);
+        }
+    }
+
 
 }

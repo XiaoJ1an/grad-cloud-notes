@@ -1,5 +1,6 @@
 package com.university.gradcloudnotes.service;
 
+import com.university.gradcloudnotes.entity.request.LoginRequest;
 import com.university.gradcloudnotes.entity.request.RegisterRequest;
 import com.university.gradcloudnotes.entity.response.UniversalResponse;
 import com.university.gradcloudnotes.jpa.CnUser;
@@ -13,17 +14,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     /**密钥*/
-    public static final String key = "abcdefabcdefabcdefabcdef";
+    public static final String key = "abcdabcdabcdabcdabcdabcd";
 
     @Autowired
     private CnUserRepository cnUserRepository;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     public UniversalResponse register(RegisterRequest registerRequest) {
         /**判断用户名是否重复*/
@@ -46,5 +58,20 @@ public class UserService {
         /**存表*/
         cnUserRepository.save(cnUser);
         return GetReturn.getReturn("200", "用户信息保存成功！", null);
+    }
+
+    public UniversalResponse login(LoginRequest loginRequest) throws UnsupportedEncodingException {
+        /**调用CustomUserDetailsService*/
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUserName());
+        /**比较密码是否一致*/
+        logger.info("通过安全认证框架得到的数据库密码为：pwd={}", userDetails.getPassword());
+        /**密码解密*/
+        String decryptStr = EncryptUtil.getDecryptStr(key, userDetails.getPassword());
+        logger.info("解密后的密码pwd={}", decryptStr);
+        if(decryptStr.equals(loginRequest.getPassword())) {
+            /**密码一致*/
+            return GetReturn.getReturn("200", "登录成功", null);
+        }
+        return GetReturn.getReturn("400", "登录失败", null);
     }
 }
