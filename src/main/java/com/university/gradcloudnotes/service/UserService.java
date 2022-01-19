@@ -14,16 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -39,7 +34,11 @@ public class UserService {
 
     public UniversalResponse register(RegisterRequest registerRequest) {
         /**判断用户名是否重复*/
-        //TODO
+        List<CnUser> users = cnUserRepository.findAllByUserName(registerRequest.getUserName());
+
+        if(users != null && users.size() > 0) {
+            return GetReturn.getReturn("400", "用户名已注册，请更换！", null);
+        }
         /**对密码进行加密处理*/
         String encryPasswd = EncryptUtil.getEncrypeStr(key, registerRequest.getPassword());
         logger.info("加密后的密码为：encryPasswd={}", encryPasswd);
@@ -60,7 +59,7 @@ public class UserService {
         return GetReturn.getReturn("200", "用户信息保存成功！", null);
     }
 
-    public UniversalResponse login(LoginRequest loginRequest) throws UnsupportedEncodingException {
+    public UniversalResponse login(LoginRequest loginRequest) {
         /**调用CustomUserDetailsService*/
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUserName());
         /**比较密码是否一致*/
