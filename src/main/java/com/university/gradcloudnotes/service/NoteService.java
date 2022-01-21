@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class NoteService {
@@ -51,7 +48,7 @@ public class NoteService {
         return GetReturn.getReturn("200", "笔记信息保存成功！", null);
     }
 
-    public UniversalResponse updateNoteType(List<String> noteIds, String type) throws ParseException {
+    public UniversalResponse updateNoteType(List<String> noteIds, String type) throws Exception {
         if(noteIds == null || noteIds.size() <= 0 || StringUtils.isBlank(type))
             return GetReturn.getReturn("400", "传入参数有空值，请检查！", null);
         if(noteIds.size() == 1) {/**只是对单个笔记进行修改状态*/
@@ -82,13 +79,10 @@ public class NoteService {
                     if(!Arrays.asList("1", "3").stream().anyMatch(e -> e.equals(type)))
                         return GetReturn.getReturn("400", "已撤销的笔记不允许修改成除代办中、未完成外的其他类型！", null);
                     /**对推送日期进行判断*/
-                    String dateStr = cnNote.getPushDate() + " " + cnNote.getPushTime();
-                    Date date = PubFun.toDate(dateStr);
-                    int compare = date.compareTo(new Date());
                     String finalType = type;
-                    if(compare == 0) finalType = "3"; /**日期相等*/
+                    int compare = checkPushDateAndTime(cnNote);
+                    if(compare == 0 || compare == -1) finalType = "3"; /**日期相等、推送日期已过*/
                     if(compare == 1) finalType = "1"; /**推送日期未到*/
-                    if(compare == -1) finalType = "3"; /**推送日期已过*/
                     /**更新类型*/
                     updateNote(cnNote, finalType);
                     return GetReturn.getReturn("200", "更新成功！", null);
@@ -96,8 +90,52 @@ public class NoteService {
             }
             return GetReturn.getReturn("400", "无可查询数据！", null);
         }
-        //todo
-        return GetReturn.getReturn("400", "暂不支持多id", null);
+        if(noteIds.size() > 0) {/**说明是要批量取回或者批量完成*/
+            Iterable<CnNote> cnNotes = cnNoteRepository.findAllById(noteIds);
+            List<CnNote> cnNoteList = new ArrayList<>();
+            cnNotes.forEach(single->{cnNoteList.add(single);});
+            /**对传入的type进行校验*/
+            if("QH".equals(type)) {/**说明是要批量取回*/
+                /**校验这些id对应的笔记是否都为4*/
+                boolean match = cnNoteList.stream().allMatch(e -> "4".equals(e.getType()));
+                if(!match) return GetReturn.getReturn("400", "不是所有的笔记都是已撤销的状态，不允许批量取回！", null);
+                /**校验推送日期和推送时间*/
+                cnNoteList.forEach(e -> {
+                    String pushType = type;
+                    int result = checkPushDateAndTime(e);
+                    if(result == 0 || result == -1) pushType = "3"; /**日期相等、推送日期已过*/
+                    if(result == 1) pushType = "1"; /**推送日期未到*/
+                    /**更新类型*/
+                    updateNote(e, pushType);
+                });
+                return GetReturn.getReturn("200", "批量取回成功！", null);
+            }
+            if("2".equals(type)) {/**说明是批量完成*/
+                /**校验id是否为1或者3*/
+                boolean match = cnNoteList.stream().anyMatch(e -> ("1".equals(e.getType()) || "3".equals(e.getType())));
+                if(!match) return GetReturn.getReturn("400", "不是所有的笔记都是代办中或者未完成，不能做批量完成的操作！", null);
+                /**批量完成*/
+                cnNoteList.forEach(e -> {
+                    /**更新类型*/
+                    updateNote(e, type);
+                });
+                return GetReturn.getReturn("200", "批量完成成功！", null);
+            }
+            return GetReturn.getReturn("400", "暂不支持除批量取回、完成的其他操作！", null);
+        }
+        return GetReturn.getReturn("400", "updateNoteType异常！", null);
+    }
+
+    private int checkPushDateAndTime(CnNote cnNote) {
+        try {
+            String dateStr = cnNote.getPushDate() + " " + cnNote.getPushTime();
+            Date date = PubFun.toDate(dateStr);
+            int compare = date.compareTo(new Date());
+            return compare;
+        } catch (ParseException e) {
+            logger.info("校验推送日期和推送时间发生异常！e={}", e);
+            return -2;
+        }
     }
 
     /**更新笔记类型的公用方法*/

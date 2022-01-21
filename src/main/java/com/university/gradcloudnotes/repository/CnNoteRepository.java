@@ -8,4 +8,6 @@ public interface CnNoteRepository extends CrudRepository<CnNote, String> {
     /**根据笔记ID更新状态*/
     @Query(value = " UPDATE cn_note a SET a.type = ?2 WHERE a.id = ?1  ", nativeQuery = true)
     void updateNoteType(String noteId, String type);
+    /**通过id集合查询实体*/
+
 }
