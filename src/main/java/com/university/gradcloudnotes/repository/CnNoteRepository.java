@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface CnNoteRepository extends CrudRepository<CnNote, String> {
-    /**根据笔记ID更新状态*/
+    /**根据笔记ID更新类型*/
     @Query(value = " UPDATE cn_note a SET a.type = ?2 WHERE a.id = ?1  ", nativeQuery = true)
     void updateNoteType(String noteId, String type);
     /**查询历史记录*/

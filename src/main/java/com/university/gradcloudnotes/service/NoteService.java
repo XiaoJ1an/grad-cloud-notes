@@ -169,4 +169,24 @@ public class NoteService {
         List<CnNote> notesByType = cnNoteRepository.getNotesByType(userId, noteType);
         return GetReturn.getReturn("200", "根据笔记类型查询笔记成功！", notesByType);
     }
+
+    public UniversalResponse deleteNotes(List<String> noteIds) {
+        /**非空校验*/
+        if(!(noteIds != null && noteIds.size() > 0)) {
+            return GetReturn.getReturn("400", "笔记id不能为空！", null);
+        }
+        /**批量删除 逻辑删除*/
+        noteIds.forEach( e -> {
+            Optional<CnNote> cnNote = cnNoteRepository.findById(e);
+            if(cnNote.isPresent()) {
+                CnNote note = cnNote.get();
+                note.setState("0");/**表示删除*/
+                /**更新日期和时间*/
+                note.setModifyDate(PubFun.getCurrentDate());
+                note.setModifyTime(PubFun.getCurrentTime());
+                cnNoteRepository.save(note);
+            }
+        });
+        return GetReturn.getReturn("200", "删除或批量删除成功！", null);
+    }
 }

@@ -79,4 +79,18 @@ public class NoteController {
         }
     }
 
+    /**删除及批量删除笔记接口*/
+    @ResponseBody
+    @PostMapping("/notes/deleteNotes")
+    public UniversalResponse deleteNotes(@RequestParam List<String> noteIds) {
+        logger.info("删除笔记接口入参noteIds={}", noteIds);
+        try {
+            UniversalResponse response = noteService.deleteNotes(noteIds);
+            return response;
+        } catch (Exception e) {
+            logger.info("调用service发生异常！e={}", e);
+            return GetReturn.getReturn("400", "删除及批量删除笔记接口异常！", null);
+        }
+    }
+
 }
