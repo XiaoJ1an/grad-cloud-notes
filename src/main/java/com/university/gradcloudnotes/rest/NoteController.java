@@ -54,7 +54,7 @@ public class NoteController {
         }
     }
 
-    /**修改笔记状态*/
+    /**修改笔记类型*/
     @ResponseBody
     @PostMapping("/notes/updateNoteType")
     public UniversalResponse updateNoteType(@RequestParam List<String> noteIds, @RequestParam String type) throws Exception {
@@ -62,6 +62,20 @@ public class NoteController {
             return noteService.updateNoteType(noteIds, type);
         } catch (ParseException e) {
             return GetReturn.getReturn("400", "调用service方法发生异常！", null);
+        }
+    }
+
+    /**查询各个类型的笔记*/
+    @ResponseBody
+    @PostMapping("/notes/queryNotes")
+    public UniversalResponse queryNotes(@RequestParam String userId, @RequestParam String noteType) {
+        try {
+            logger.info("查询各个类型的笔记接口入参：userId={}, noteType={}", userId, noteType);
+            UniversalResponse response = noteService.queryNotes(userId, noteType);
+            return response;
+        } catch (Exception e) {
+            logger.info("调用查询各个类型的笔记接口service发生异常！e={}",e);
+            return GetReturn.getReturn("400", "调用查询各个类型的笔记接口service发生异常！", null);
         }
     }
 

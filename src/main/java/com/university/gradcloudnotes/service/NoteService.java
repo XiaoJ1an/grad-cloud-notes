@@ -3,7 +3,9 @@ package com.university.gradcloudnotes.service;
 import com.university.gradcloudnotes.entity.request.NoteRequest;
 import com.university.gradcloudnotes.entity.response.UniversalResponse;
 import com.university.gradcloudnotes.jpa.CnNote;
+import com.university.gradcloudnotes.jpa.CnUser;
 import com.university.gradcloudnotes.repository.CnNoteRepository;
+import com.university.gradcloudnotes.repository.CnUserRepository;
 import com.university.gradcloudnotes.rest.NoteController;
 import com.university.gradcloudnotes.utils.GetReturn;
 import com.university.gradcloudnotes.utils.PubFun;
@@ -25,6 +27,8 @@ public class NoteService {
 
     @Autowired
     private CnNoteRepository cnNoteRepository;
+    @Autowired
+    private CnUserRepository cnUserRepository;
 
     /**新增笔记*/
     public UniversalResponse addNotes(NoteRequest noteRequest) {
@@ -146,4 +150,23 @@ public class NoteService {
         cnNoteRepository.save(cnNote);
     }
 
+    public UniversalResponse queryNotes(String userId, String noteType) {
+        /**对用户信息进行校验*/
+        Optional<CnUser> byId = cnUserRepository.findById(userId);
+        if(!byId.isPresent()) {
+            return GetReturn.getReturn("400", "无此用户信息！", null);
+        }
+        /**判断笔记类型是否为空*/
+        if(StringUtils.isBlank(noteType)) {
+            /**笔记类型为空，说明是查询历史记录*/
+            List<CnNote> historyNotes = cnNoteRepository.getHistoryNotes(userId);
+            return GetReturn.getReturn("200", "查询历史记录成功！", historyNotes);
+        }
+        /**笔记类型不为空，判断传入的类型是否符合要求*/
+        boolean match = Arrays.asList("1", "2", "3", "4").stream().anyMatch(e -> e.equals(noteType));
+        if(!match) return GetReturn.getReturn("400", "传入的笔记类型有误，请检查！", null);
+        /**根据用户id和笔记类型查询笔记信息*/
+        List<CnNote> notesByType = cnNoteRepository.getNotesByType(userId, noteType);
+        return GetReturn.getReturn("200", "根据笔记类型查询笔记成功！", notesByType);
+    }
 }

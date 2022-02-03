@@ -10,6 +10,7 @@ import com.university.gradcloudnotes.utils.EncryptUtil;
 import com.university.gradcloudnotes.utils.GetReturn;
 import com.university.gradcloudnotes.utils.PubFun;
 import com.university.gradcloudnotes.utils.UUIDUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -32,22 +33,23 @@ public class UserService {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
-    public UniversalResponse register(RegisterRequest registerRequest) {
+    public UniversalResponse register(String userName, String password) {
         /**判断用户名是否重复*/
-        List<CnUser> users = cnUserRepository.findAllByUserName(registerRequest.getUserName());
+        List<CnUser> users = cnUserRepository.findAllByUserName(userName);
 
         if(users != null && users.size() > 0) {
             return GetReturn.getReturn("400", "用户名已注册，请更换！", null);
         }
         /**对密码进行加密处理*/
-        String encryPasswd = EncryptUtil.getEncrypeStr(key, registerRequest.getPassword());
+        String encryPasswd = EncryptUtil.getEncrypeStr(key, password);
         logger.info("加密后的密码为：encryPasswd={}", encryPasswd);
-        registerRequest.setPassword(encryPasswd);
-        /**属性复制*/
+        /**属性赋值*/
         CnUser cnUser = new CnUser();
-        BeanUtils.copyProperties(registerRequest, cnUser);
         /**主键生成*/
         cnUser.setId(UUIDUtil.getUUID());
+        cnUser.setUserName(userName);
+        cnUser.setNickName(userName);
+        cnUser.setPassword(encryPasswd);
         /**其他字段赋值*/
         cnUser.setMakeDate(PubFun.getCurrentDate());
         cnUser.setMakeTime(PubFun.getCurrentTime());
@@ -56,12 +58,15 @@ public class UserService {
         logger.info("属性复制后的user信息为：cnUser={}", cnUser);
         /**存表*/
         cnUserRepository.save(cnUser);
-        return GetReturn.getReturn("200", "用户信息保存成功！", null);
+        return GetReturn.getReturn("200", "用户信息保存成功！", cnUser.getId());
     }
 
     public UniversalResponse login(LoginRequest loginRequest) {
         /**调用CustomUserDetailsService*/
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUserName());
+        /**判断是否有数据*/
+        if("401".equals(userDetails.getUsername()))
+            return GetReturn.getReturn("401", "用户未注册！", null);
         /**比较密码是否一致*/
         logger.info("通过安全认证框架得到的数据库密码为：pwd={}", userDetails.getPassword());
         /**密码解密*/
@@ -69,8 +74,8 @@ public class UserService {
         logger.info("解密后的密码pwd={}", decryptStr);
         if(decryptStr.equals(loginRequest.getPassword())) {
             /**密码一致*/
-            return GetReturn.getReturn("200", "登录成功", null);
+            return GetReturn.getReturn("200", "登录成功！", UUIDUtil.getUUID() + UUIDUtil.getUUID());
         }
-        return GetReturn.getReturn("400", "登录失败", null);
+        return GetReturn.getReturn("402", "用户名和密码错误！", null);
     }
 }
