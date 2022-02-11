@@ -14,3 +14,5 @@ logging:
     com.university: debug
   file:
     path: log/
+#文件上传路径
+file-path-upload: /home/cloud-notes/uploads

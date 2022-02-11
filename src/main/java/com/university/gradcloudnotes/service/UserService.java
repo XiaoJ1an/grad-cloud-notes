@@ -73,8 +73,10 @@ public class UserService {
         String decryptStr = EncryptUtil.getDecryptStr(key, userDetails.getPassword());
         logger.info("解密后的密码pwd={}", decryptStr);
         if(decryptStr.equals(loginRequest.getPassword())) {
-            /**密码一致*/
-            return GetReturn.getReturn("200", "登录成功！", UUIDUtil.getUUID() + UUIDUtil.getUUID());
+            /**密码一致 将用户id返回*/
+            List<CnUser> users = cnUserRepository.findAllByUserName(userDetails.getUsername());
+            String userId = users.get(0).getId();
+            return GetReturn.getReturn("200", "登录成功！", userId);
         }
         return GetReturn.getReturn("402", "用户名和密码错误！", null);
     }
