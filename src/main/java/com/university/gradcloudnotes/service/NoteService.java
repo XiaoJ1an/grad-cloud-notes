@@ -3,7 +3,9 @@ package com.university.gradcloudnotes.service;
 import com.university.gradcloudnotes.entity.request.NoteRequest;
 import com.university.gradcloudnotes.entity.response.UniversalResponse;
 import com.university.gradcloudnotes.jpa.CnNote;
+import com.university.gradcloudnotes.jpa.CnNotePicture;
 import com.university.gradcloudnotes.jpa.CnUser;
+import com.university.gradcloudnotes.repository.CnNotePictureRepository;
 import com.university.gradcloudnotes.repository.CnNoteRepository;
 import com.university.gradcloudnotes.repository.CnUserRepository;
 import com.university.gradcloudnotes.rest.NoteController;
@@ -29,6 +31,8 @@ public class NoteService {
     private CnNoteRepository cnNoteRepository;
     @Autowired
     private CnUserRepository cnUserRepository;
+    @Autowired
+    private CnNotePictureRepository cnNotePictureRepository;
 
     /**新增笔记*/
     public UniversalResponse addNotes(NoteRequest noteRequest) {
@@ -47,6 +51,15 @@ public class NoteService {
         BeanUtils.copyProperties(noteRequest, cnNote);
         /**生成笔记id*/
         cnNote.setId(UUIDUtil.getUUID());
+        /**关于文件的处理*/
+//        if(!StringUtils.isBlank(noteRequest.getFileId())) {/**此笔记中有涉及到文件的存储*/
+//            /**保存cn_note_picture表信息*/
+//            CnNotePicture cnNotePicture = new CnNotePicture();
+//            cnNotePicture.setId(UUIDUtil.getUUID());
+//            cnNotePicture.setNoteId(cnNote.getId());
+//            cnNotePicture.setPictureId(noteRequest.getFileId());
+//            cnNotePictureRepository.save(cnNotePicture);
+//        }
         /**保存数据*/
         cnNoteRepository.save(cnNote);
         return GetReturn.getReturn("200", "笔记信息保存成功！", null);

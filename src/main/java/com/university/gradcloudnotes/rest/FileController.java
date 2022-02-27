@@ -25,20 +25,16 @@ public class FileController {
      * 文件上传
      */
     @PostMapping("/file/uploadFile")
-    public UniversalResponse uploadFile(@RequestParam MultipartFile[] files) {
-
+    public UniversalResponse uploadFile(@RequestParam MultipartFile[] files, @RequestParam String type) {
+        logger.info("调用文件上传接口入参type={}", type);
         for (MultipartFile file : files) {
             /**文件非空校验*/
             if(!(file != null && file.getSize() > 0)) {
                 return GetReturn.getReturn("400", "请勿上传空文件！", null);
             }
-            /**文件类型校验*/
-            if(!("jpg".equalsIgnoreCase(file.getContentType()) || "png".equalsIgnoreCase(file.getContentType()))) {
-                return GetReturn.getReturn("400", "不支持此文件格式！", null);
-            }
             /**文件上传*/
             try {
-                return fileService.uploadFile(file);
+                return fileService.uploadFile(file, type);
             } catch (Exception e) {
                 logger.info("文件上传发生异常！e={}", e);
                 return GetReturn.getReturn("400", "文件上传发生异常！", e);
