@@ -45,5 +45,17 @@ public class UserController {
         }
     }
 
+    /**用户详细信息保存和修改*/
+    @PostMapping("/user/saveUserInfo")
+    public UniversalResponse saveUserInfo(@RequestBody RegisterRequest registerRequest) {
+        try {
+            UniversalResponse response = userService.saveUserInfo(registerRequest);
+            return  response;
+        } catch (Exception e) {
+            logger.info("调用service方法发生异常！e={}", e);
+            return GetReturn.getReturn("400", "调用service方法发生异常！", null);
+        }
+    }
+
 
 }

@@ -5,9 +5,7 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
     /**用户名*/
-    private String userName;
-    /**密码*/
-    private String password;
+    private String userId;
     /**真实姓名*/
     private String name;
     /**性别*/
@@ -19,5 +17,5 @@ public class RegisterRequest {
     /**昵称*/
     private String nickName;
     /**头像地址*/
-    private String picture;
+    private String pictureUrl;
 }
