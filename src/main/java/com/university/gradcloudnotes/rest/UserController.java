@@ -36,24 +36,36 @@ public class UserController {
     /**用户登录接口*/
     @PostMapping("/user/login")
     public UniversalResponse login(@RequestBody LoginRequest loginRequest) {
+        logger.info("用户登录接口入参为loginRequest={}", loginRequest);
         try {
-            UniversalResponse response = userService.login(loginRequest);
-            return response;
+            return userService.login(loginRequest);
         } catch (Exception e) {
             logger.info("调用service方法发生异常！e={}", e);
-            return GetReturn.getReturn("400", "调用service方法发生异常！", null);
+            return GetReturn.getReturn("400", "用户登录接口调用方法发生异常！", null);
         }
     }
 
     /**用户详细信息保存和修改*/
     @PostMapping("/user/saveUserInfo")
     public UniversalResponse saveUserInfo(@RequestBody RegisterRequest registerRequest) {
+        logger.info("用户详细信息保存和修改接口入参registerRequest={}", registerRequest);
         try {
-            UniversalResponse response = userService.saveUserInfo(registerRequest);
-            return  response;
+            return userService.saveUserInfo(registerRequest);
         } catch (Exception e) {
             logger.info("调用service方法发生异常！e={}", e);
-            return GetReturn.getReturn("400", "调用service方法发生异常！", null);
+            return GetReturn.getReturn("400", "用户详细信息保存和修改接口调用方法发生异常！", null);
+        }
+    }
+
+    /**用户详细信息展示*/
+    @PostMapping("/user/showUserInfo")
+    public UniversalResponse showUserInfo(@RequestParam String userId) {
+        logger.info("用户详细信息展示接口入参userId={}", userId);
+        try {
+            return userService.showUserInfo(userId);
+        } catch (Exception e) {
+            logger.info("调用service方法发生异常！e={}", e);
+            return GetReturn.getReturn("400", "用户详细信息展示接口调用方法发生异常！", null);
         }
     }
 

@@ -3,6 +3,7 @@ package com.university.gradcloudnotes.service;
 import com.university.gradcloudnotes.entity.request.LoginRequest;
 import com.university.gradcloudnotes.entity.request.RegisterRequest;
 import com.university.gradcloudnotes.entity.response.UniversalResponse;
+import com.university.gradcloudnotes.entity.response.UserResponse;
 import com.university.gradcloudnotes.jpa.CnUser;
 import com.university.gradcloudnotes.repository.CnUserRepository;
 import com.university.gradcloudnotes.rest.UserController;
@@ -106,5 +107,15 @@ public class UserService {
             return GetReturn.getReturn("200", "用户信息保存成功！", null);
         }
         return GetReturn.getReturn("400", "未查询到该用户信息！", null);
+    }
+
+    public UniversalResponse showUserInfo(String userId) {
+        CnUser cnUser = cnUserRepository.findById(userId).orElse(null);
+        if(!Objects.isNull(cnUser)) {/**非空校验*/
+            UserResponse userResponse = new UserResponse();
+            BeanUtils.copyProperties(cnUser, userResponse);
+            return GetReturn.getReturn("200", "获取用户详细信息成功！", userResponse);
+        }
+        return GetReturn.getReturn("400", "未查询到此用户的信息！", null);
     }
 }
