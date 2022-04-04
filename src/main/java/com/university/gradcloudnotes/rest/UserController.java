@@ -58,7 +58,7 @@ public class UserController {
     }
 
     /**用户详细信息展示*/
-    @PostMapping("/user/showUserInfo")
+    @GetMapping("/user/showUserInfo")
     public UniversalResponse showUserInfo(@RequestParam String userId) {
         logger.info("用户详细信息展示接口入参userId={}", userId);
         try {
