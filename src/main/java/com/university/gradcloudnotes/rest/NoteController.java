@@ -35,8 +35,10 @@ public class NoteController {
             return GetReturn.getReturn("400", "笔记内容为空！", null);
         if(StringUtils.isBlank(noteRequest.getType()))
             return GetReturn.getReturn("400", "笔记类型为空！", null);
-        if(StringUtils.isBlank(noteRequest.getGroupId()))
-            return GetReturn.getReturn("400", "笔记分组为空！", null);
+        if(!"5".equals(noteRequest.getType())) {
+            if(StringUtils.isBlank(noteRequest.getGroupId()))
+                return GetReturn.getReturn("400", "笔记分组为空！", null);
+        }
         if(StringUtils.isBlank(noteRequest.getUserId()))
             return GetReturn.getReturn("400", "笔记所有者为空！", null);
         if(StringUtils.isBlank(noteRequest.getPushDate()))
