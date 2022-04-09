@@ -11,6 +11,9 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  redis:
+    host: 116.62.20.242
+    port: 6379
 logging:
   level:
     com.university: debug
