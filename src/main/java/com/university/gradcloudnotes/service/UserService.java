@@ -16,9 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,6 +37,8 @@ public class UserService {
     private CnUserRepository cnUserRepository;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public UniversalResponse register(String userName, String password) {
         /**判断用户名是否重复*/
@@ -64,6 +69,28 @@ public class UserService {
     }
 
     public UniversalResponse login(LoginRequest loginRequest) {
+        if(!StringUtils.isEmpty(loginRequest.getPhoneNo())) {//说明是验证码登录
+            //验证码非空校验
+            if(StringUtils.isEmpty(loginRequest.getVerCode())) {
+                return GetReturn.getReturn("400", "验证码不能为空！", null);
+            }
+            //验证码时效性校验
+            String redisVerCode = Objects.requireNonNull(redisTemplate.opsForValue().get(loginRequest.getPhoneNo())).toString();
+            if(StringUtils.isEmpty(redisVerCode)) {//说明验证码已过期
+                return GetReturn.getReturn("400", "验证码已过期！", null);
+            }
+            //验证码正确性校验
+            if(!redisVerCode.equals(loginRequest.getVerCode())) {//验证码错误
+                return GetReturn.getReturn("400", "验证码有误！", null);
+            }
+            //用户是否注册校验
+            List<CnUser> users = cnUserRepository.findAllByPhoneNo(loginRequest.getPhoneNo());
+            if(CollectionUtils.isEmpty(users)) {//数据库中无此数据，表示未注册
+                return GetReturn.getReturn("400", "用户未注册！", null);
+            }
+            //验证通过，返回登录成功数据
+            return GetReturn.getReturn("200", "登录成功！", users.get(0).getId());
+        }
         /**调用CustomUserDetailsService*/
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getUserName());
         /**判断是否有数据*/

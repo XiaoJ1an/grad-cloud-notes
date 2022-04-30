@@ -8,4 +8,8 @@ public class LoginRequest {
     private String userName;
     /**密码*/
     private String password;
+    //手机号码
+    private String phoneNo;
+    //验证码
+    private String verCode;
 }
