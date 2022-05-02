@@ -58,7 +58,7 @@ public class NoteController {
 
     /**修改笔记类型*/
     @ResponseBody
-    @PostMapping("/notes/updateNoteType")
+    @GetMapping("/notes/updateNoteType")
     public UniversalResponse updateNoteType(@RequestParam List<String> noteIds, @RequestParam String type) throws Exception {
         try {
             return noteService.updateNoteType(noteIds, type);
