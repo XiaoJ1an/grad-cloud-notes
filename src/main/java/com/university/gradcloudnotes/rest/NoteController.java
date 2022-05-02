@@ -69,7 +69,7 @@ public class NoteController {
 
     /**查询各个类型的笔记*/
     @ResponseBody
-    @PostMapping("/notes/queryNotes")
+    @GetMapping("/notes/queryNotes")
     public UniversalResponse queryNotes(@RequestParam String userId, @RequestParam String noteType) {
         try {
             logger.info("查询各个类型的笔记接口入参：userId={}, noteType={}", userId, noteType);
