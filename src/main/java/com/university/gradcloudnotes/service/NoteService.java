@@ -176,7 +176,7 @@ public class NoteService {
             return GetReturn.getReturn("200", "查询历史记录成功！", historyNotes);
         }
         /**笔记类型不为空，判断传入的类型是否符合要求*/
-        boolean match = Arrays.asList("1", "2", "3", "4").stream().anyMatch(e -> e.equals(noteType));
+        boolean match = Arrays.asList("1", "2", "3", "4", "5").stream().anyMatch(e -> e.equals(noteType));
         if(!match) return GetReturn.getReturn("400", "传入的笔记类型有误，请检查！", null);
         /**根据用户id和笔记类型查询笔记信息*/
         List<CnNote> notesByType = cnNoteRepository.getNotesByType(userId, noteType);
