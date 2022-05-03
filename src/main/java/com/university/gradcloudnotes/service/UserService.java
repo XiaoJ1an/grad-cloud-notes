@@ -57,6 +57,8 @@ public class UserService {
         cnUser.setUserName(userName);
         cnUser.setNickName(userName);
         cnUser.setPassword(encryPasswd);
+        //设置用户角色
+        cnUser.setUserRole("USER");
         /**其他字段赋值*/
         cnUser.setMakeDate(PubFun.getCurrentDate());
         cnUser.setMakeTime(PubFun.getCurrentTime());
